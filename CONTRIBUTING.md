@@ -33,7 +33,7 @@ Please be respectful and constructive when interacting with maintainers and othe
 ### Clone and Submodules
 
 ```bash
-git clone https://github.com/alireza0/s-ui
+git clone https://github.com/Teminuosi/s-ui
 cd s-ui
 git submodule update --init --recursive
 ```
@@ -105,7 +105,7 @@ Use the same tags when building locally if you need feature parity with releases
 ### Docker (optional)
 
 ```bash
-git clone https://github.com/alireza0/s-ui
+git clone https://github.com/Teminuosi/s-ui
 cd s-ui
 git submodule update --init --recursive
 docker build -t s-ui .
@@ -185,7 +185,7 @@ go vet ./...
 
 ## Features That Need Help
 
-Community help is especially valuable in these areas. Check the [Issues](https://github.com/alireza0/s-ui/issues) for current tasks and ideas.
+Community help is especially valuable in these areas. Check the [Issues](https://github.com/Teminuosi/s-ui/issues) for current tasks and ideas.
 
 ### High-Value Areas
 
