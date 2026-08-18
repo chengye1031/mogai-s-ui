@@ -42,13 +42,16 @@ gen_random_string() {
 # Is a TCP port currently being listened on? (used to avoid clashing with an
 # existing panel such as 3x-ui, whose default sub port is also 2096.)
 is_port_in_use() {
+    # 整行匹配「:端口 + 空白/行尾」,不按第几列取 —— 不同版本 ss/netstat 列数不一样,
+    # 按列取会悄悄失效,而失效表现是「误判端口空闲」、装完照样起不来,比报错更难查。
+    # 末尾的边界防止 12096 / 20960 被误判成 2096。
     local port="$1"
     if command -v ss > /dev/null 2>&1; then
-        ss -ltn 2> /dev/null | awk -v p=":${port}\$" '$4 ~ p {exit 0} END {exit 1}'
+        ss -ltn 2> /dev/null | grep -qE "[:.]${port}([[:space:]]|$)"
         return
     fi
     if command -v netstat > /dev/null 2>&1; then
-        netstat -lnt 2> /dev/null | awk -v p=":${port} " '$4 ~ p {exit 0} END {exit 1}'
+        netstat -lnt 2> /dev/null | grep -qE "[:.]${port}([[:space:]]|$)"
         return
     fi
     if command -v lsof > /dev/null 2>&1; then
