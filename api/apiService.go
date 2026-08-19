@@ -321,6 +321,20 @@ func (a *ApiService) Save(c *gin.Context, loginUser string) {
 	}
 }
 
+// GetUpdateInfo 查线上有没有新版本。查不到(断网、GitHub 不通)只回报错,
+// 不影响面板其它功能 —— 前端拿不到就不显示徽标。
+func (a *ApiService) GetUpdateInfo(c *gin.Context) {
+	info, err := a.PanelService.GetUpdateInfo()
+	jsonObj(c, info, err)
+}
+
+// UpdatePanel 触发面板自更新。更新进程会被甩到面板生命周期之外(systemd-run
+// 或 setsid),所以这个接口返回之后面板才重启,前端能收到这次响应。
+func (a *ApiService) UpdatePanel(c *gin.Context) {
+	err := a.PanelService.StartUpdate()
+	jsonMsg(c, "updatePanel", err)
+}
+
 func (a *ApiService) RestartApp(c *gin.Context) {
 	err := a.PanelService.RestartPanel(3)
 	jsonMsg(c, "restartApp", err)
