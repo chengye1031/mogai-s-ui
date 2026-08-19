@@ -120,14 +120,25 @@ docker build -t s-ui .
 
 ## 卸载
 
+面板还能用的话，直接进管理菜单选卸载：
+
 ```sh
-sudo -i
-systemctl disable s-ui --now
-rm -f /etc/systemd/system/sing-box.service
-systemctl daemon-reload
-rm -fr /usr/local/s-ui
-rm -f /usr/bin/s-ui
+s-ui        # 菜单里选「卸载」
 ```
+
+### 卸载不掉 / 装到一半失败了怎么办
+
+安装中途被打断时，面板会处于**装了一半**的状态：文件还在，但菜单可能已经打不开。
+这条**彻底清除**命令不依赖任何已安装的文件：
+
+```sh
+bash <(curl -Ls https://raw.githubusercontent.com/Teminuosi/s-ui/main/install.sh) purge
+```
+
+它会清掉：systemd 服务、`/etc/s-ui/`（含数据库）、`/usr/local/s-ui/`、
+以及 `/usr/bin/s-ui` 管理命令，并杀掉残留进程释放端口。清完可以直接重新安装。
+
+> 注意：**数据库会一起删掉**，入站和用户配置不会保留。
 
 ---
 

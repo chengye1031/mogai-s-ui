@@ -105,6 +105,33 @@ resolve_port_clash() {
 # check root
 [[ $EUID -ne 0 ]] && echo -e "${red}Fatal error: ${plain} Please run this script with root privilege \n " && exit 1
 
+# 一键彻底清除入口: bash <(curl -Ls .../install.sh) purge
+# 为什么不复用 s-ui.sh 的卸载:安装被中断时 /usr/bin/s-ui 可能压根没铺下去,
+# 那条路走不通。这里只依赖 root,不依赖任何已安装的文件,也不做系统检测 ——
+# 检测失败就 exit 的话,最需要清理的机器反而清不了。
+if [[ "$1" == "purge" || "$1" == "uninstall" || "$1" == "--purge" ]]; then
+    echo -e "${yellow}Removing every trace of s-ui from this system...${plain}"
+
+    # 每一步独立执行、失败不影响后面:装坏的机器上服务和文件往往只存在一部分。
+    systemctl stop s-ui >/dev/null 2>&1
+    systemctl disable s-ui >/dev/null 2>&1
+    # 二进制被删掉后残留的进程会占着端口,先杀干净
+    pkill -9 -f '/usr/local/s-ui' >/dev/null 2>&1
+    rm -f /etc/systemd/system/s-ui.service
+    rm -f /etc/systemd/system/multi-user.target.wants/s-ui.service
+    systemctl daemon-reload >/dev/null 2>&1
+    systemctl reset-failed >/dev/null 2>&1
+
+    rm -rf /etc/s-ui/
+    rm -rf /usr/local/s-ui/
+    rm -f /usr/bin/s-ui
+
+    echo -e "${green}Done. s-ui has been completely removed.${plain}"
+    echo -e "Reinstall with: ${green}bash <(curl -Ls https://raw.githubusercontent.com/Teminuosi/s-ui/main/install.sh)${plain}"
+    exit 0
+fi
+
+
 # Check OS and set release variable
 if [[ -f /etc/os-release ]]; then
     source /etc/os-release

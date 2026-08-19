@@ -859,7 +859,9 @@ show_menu() {
         check_install && custom_version
         ;;
     4)
-        check_install && uninstall
+        # 卸载不设前置检查:装到一半失败时面板状态就是「未安装」,
+        # 再挡一道就成了死锁 —— 残留文件反而永远清不掉。
+        uninstall
         ;;
     5)
         check_install && reset_admin
@@ -948,7 +950,7 @@ if [[ $# > 0 ]]; then
         check_uninstall 0 && install 0
         ;;
     "uninstall")
-        check_install 0 && uninstall 0
+        uninstall 0
         ;;
     *) show_usage ;;
     esac
